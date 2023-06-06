@@ -16,7 +16,7 @@ pipeline {
       
     stage('Get source code') {
       steps {
-        git branch: 'master', 
+        git branch: 'main', 
             url: 'http://gogs:3000/gogs-user/curiosityconfig.git'
       }
     }
