@@ -1,8 +1,8 @@
 <?xml version='1.1' encoding='UTF-8'?>
-<flow-definition plugin="workflow-job@1292.v27d8cc3e2602">
+<flow-definition plugin="workflow-job@1308.v58d48a_763b_31">
   <actions>
-    <org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobAction plugin="pipeline-model-definition@2.2131.vb_9788088fdb_5"/>
-    <org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobPropertyTrackerAction plugin="pipeline-model-definition@2.2131.vb_9788088fdb_5">
+    <org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobAction plugin="pipeline-model-definition@2.2133.ve46a_6113dfc3"/>
+    <org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobPropertyTrackerAction plugin="pipeline-model-definition@2.2133.ve46a_6113dfc3">
       <jobProperties/>
       <triggers/>
       <parameters/>
@@ -21,7 +21,7 @@
       </strategy>
     </jenkins.model.BuildDiscarderProperty>
     <org.jenkinsci.plugins.gogs.GogsProjectProperty plugin="gogs-webhook@1.0.15">
-      <gogsSecret>{AQAAABAAAAAQwxuJcJxMLKMe6caSAw54UhEYrKN7v6rmTTwaMhS0IJ4=}</gogsSecret>
+      <gogsSecret></gogsSecret>
       <gogsUsePayload>false</gogsUsePayload>
       <gogsBranchFilter></gogsBranchFilter>
     </org.jenkinsci.plugins.gogs.GogsProjectProperty>
@@ -29,25 +29,24 @@
       <triggers/>
     </org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
   </properties>
-  <definition class="org.jenkinsci.plugins.workflow.cps.CpsScmFlowDefinition" plugin="workflow-cps@3659.v582dc37621d8">
-    <scm class="hudson.plugins.git.GitSCM" plugin="git@5.0.1">
+  <definition class="org.jenkinsci.plugins.workflow.cps.CpsScmFlowDefinition" plugin="workflow-cps@3673.v5b_dd74276262">
+    <scm class="hudson.plugins.git.GitSCM" plugin="git@5.0.2">
       <configVersion>2</configVersion>
       <userRemoteConfigs>
         <hudson.plugins.git.UserRemoteConfig>
-          <url>http://gogs:3000/fernando-harris/curiosityconfig.git</url>
-          <credentialsId>jenkins-gogs-ssh</credentialsId>
+          <url>http://gogs:3000/gogs-user/curiosityconfig.git</url>
         </hudson.plugins.git.UserRemoteConfig>
       </userRemoteConfigs>
       <branches>
         <hudson.plugins.git.BranchSpec>
-          <name>*/master</name>
+          <name>*/main</name>
         </hudson.plugins.git.BranchSpec>
       </branches>
       <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
       <submoduleCfg class="empty-list"/>
       <extensions/>
     </scm>
-    <scriptPath>./jenkins-config/curiosityconfig.groovy</scriptPath>
+    <scriptPath>curiosityconfig.groovy</scriptPath>
     <lightweight>true</lightweight>
   </definition>
   <triggers/>
