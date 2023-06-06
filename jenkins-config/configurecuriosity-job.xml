@@ -1,0 +1,124 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <jenkins.model.BuildDiscarderProperty>
+      <strategy class="hudson.tasks.LogRotator">
+        <daysToKeep>5</daysToKeep>
+        <numToKeep>5</numToKeep>
+        <artifactDaysToKeep>-1</artifactDaysToKeep>
+        <artifactNumToKeep>-1</artifactNumToKeep>
+      </strategy>
+    </jenkins.model.BuildDiscarderProperty>
+    <org.jenkinsci.plugins.gogs.GogsProjectProperty plugin="gogs-webhook@1.0.15">
+      <gogsSecret>{AQAAABAAAAAQySqtr9SRWX6XfPIe65PlLy/Wl/k8CBGCXJ1IukpzziA=}</gogsSecret>
+      <gogsUsePayload>false</gogsUsePayload>
+      <gogsBranchFilter></gogsBranchFilter>
+    </org.jenkinsci.plugins.gogs.GogsProjectProperty>
+  </properties>
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@5.0.1">
+    <configVersion>2</configVersion>
+    <userRemoteConfigs>
+      <hudson.plugins.git.UserRemoteConfig>
+        <url>http://gogs:3000/fernando-harris/curiosityconfig.git</url>
+        <credentialsId>jenkins-gogs-ssh</credentialsId>
+      </hudson.plugins.git.UserRemoteConfig>
+    </userRemoteConfigs>
+    <branches>
+      <hudson.plugins.git.BranchSpec>
+        <name>**</name>
+      </hudson.plugins.git.BranchSpec>
+    </branches>
+    <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+    <submoduleCfg class="empty-list"/>
+    <extensions/>
+  </scm>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>#!/bin/bash
+
+echo &quot;Curiosity Configuration...&quot;
+echo &quot;files:&quot;
+ls -ltr
+
+echo &quot;Creating namespace...&quot;
+kubectl apply -f curiositymonolith-namespace.yaml
+
+echo &quot;Creating mysql secrets for app and root...&quot;
+#kubectl apply -f curiositymonolith-mysql-db-secret.yaml
+kubectl -n curiositymonolith create secret generic curiositymonolith-mysql-db-secret --from-literal=SPRING_DATASOURCE_PASSWORD=Welcome#1 --from-literal=SPRING_DATASOURCE_USERNAME=curiosity
+#kubectl apply -f mysql-db-secret.yaml 
+
+echo &quot;Creating mysql persistent volume...&quot;
+kubectl apply -f mysql-persistentvolume.yaml 
+
+echo &quot;Creating mysql persistent volume claim...&quot;
+kubectl apply -f mysql-persistentvolumeclaim.yaml
+
+echo &quot;Deploy mysql database...&quot;
+kubectl apply -f mysql-persistent-deploy.yaml
+
+echo &quot;Creating service to expose mysql...&quot;
+kubectl apply -f mysql-db-service.yaml
+
+#echo &quot;Configuring curiosity app...&quot;
+#kubectl apply -f curiositymonolith-configmap.yaml
+
+#echo &quot;Deploy curiosity app...&quot;
+#kubectl apply -f curiositymonolith-deployment.yaml
+
+echo &quot;Creating service to expose app...&quot;
+kubectl apply -f curiositymonolith-service-loadbalancer.yaml
+</command>
+      <configuredLocalRules/>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers>
+    <hudson.plugins.ws__cleanup.WsCleanup plugin="ws-cleanup@0.45">
+      <patterns class="empty-list"/>
+      <deleteDirs>false</deleteDirs>
+      <skipWhenFailed>false</skipWhenFailed>
+      <cleanWhenSuccess>true</cleanWhenSuccess>
+      <cleanWhenUnstable>true</cleanWhenUnstable>
+      <cleanWhenFailure>true</cleanWhenFailure>
+      <cleanWhenNotBuilt>true</cleanWhenNotBuilt>
+      <cleanWhenAborted>true</cleanWhenAborted>
+      <notFailBuild>false</notFailBuild>
+      <cleanupMatrixParent>false</cleanupMatrixParent>
+      <externalDelete></externalDelete>
+      <disableDeferredWipeout>false</disableDeferredWipeout>
+    </hudson.plugins.ws__cleanup.WsCleanup>
+  </publishers>
+  <buildWrappers>
+    <org.jenkinsci.plugins.kubernetes.cli.MultiKubectlBuildWrapper plugin="kubernetes-cli@1.12.0">
+      <kubectlCredentials>
+        <org.jenkinsci.plugins.kubernetes.cli.KubectlCredential>
+          <serverUrl>https://192.168.5.15:6443</serverUrl>
+          <credentialsId>jenkins-token-kubernetes</credentialsId>
+          <caCertificate>-----BEGIN CERTIFICATE-----
+MIIBdzCCAR2gAwIBAgIBADAKBggqhkjOPQQDAjAjMSEwHwYDVQQDDBhrM3Mtc2Vy
+dmVyLWNhQDE2ODM2MzgyNDgwHhcNMjMwNTA5MTMxNzI4WhcNMzMwNTA2MTMxNzI4
+WjAjMSEwHwYDVQQDDBhrM3Mtc2VydmVyLWNhQDE2ODM2MzgyNDgwWTATBgcqhkjO
+PQIBBggqhkjOPQMBBwNCAATYvqoqKSp/FxWllUj/Dj0BEcT3IyNa4323on3B9sxD
++62Yb8rrlH/c4YU8bNezU/XbFhNh6pV1l9IX3vtvVYdgo0IwQDAOBgNVHQ8BAf8E
+BAMCAqQwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUdQwAMwOJH3OIfD4/xHZZ
+p8ADtggwCgYIKoZIzj0EAwIDSAAwRQIgWZgYrppoTnGI5EGoM7bSygRQmkP6Om8/
+8zyZwaOUy+UCIQDU/T+sLBbPdg47ACvj2ZHLocbL85QLgZbY0MmnRuFZxQ==
+-----END CERTIFICATE-----</caCertificate>
+          <contextName>rancher-desktop</contextName>
+          <clusterName>rancher-desktop</clusterName>
+          <namespace></namespace>
+        </org.jenkinsci.plugins.kubernetes.cli.KubectlCredential>
+      </kubectlCredentials>
+      <restrictKubeConfigAccess>false</restrictKubeConfigAccess>
+    </org.jenkinsci.plugins.kubernetes.cli.MultiKubectlBuildWrapper>
+  </buildWrappers>
+</project>
